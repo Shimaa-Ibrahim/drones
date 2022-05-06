@@ -60,7 +60,7 @@ func TestLoadingDroneWithMedicationsBatchUpdates(t *testing.T) {
 	}
 	medicationRepository := repository.NewMedicationRepository(dbClient)
 
-	t.Run("Test udate selected medications with given drone id", func(t *testing.T) {
+	t.Run("Test update selected medications with given drone id", func(t *testing.T) {
 		err := medicationRepository.UpdateMedicationsWithDroneID(context.Background(), drone.ID, medicationsIDs[1:])
 		if err != nil {
 			t.Errorf("[Error] Cannot update medications: %v", err)

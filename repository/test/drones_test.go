@@ -11,16 +11,16 @@ import (
 )
 
 func TestDroneSuccessfulCreation(t *testing.T) {
-	droneModels := []entity.DroneModel{{Name: generateRandomText(20)}, {Name: generateRandomText(20)}}
-	droneStates := []entity.DroneState{{Name: generateRandomText(20)}, {Name: generateRandomText(20)}}
 	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
 	if err != nil {
 		t.Skipf("[Error] failed to connect to database: %v", err)
 	}
 	TruncateDB(dbClient)
+	droneModels := []entity.DroneModel{{Name: "modelOne"}, {Name: "modelTwo"}}
 	if err := dbClient.Create(&droneModels).Error; err != nil {
 		t.Errorf("[Error] Cannot create droneModels: %v", err)
 	}
+	droneStates := []entity.DroneState{{Name: "stateOne"}, {Name: "stateTwo"}}
 	if err := dbClient.Create(&droneStates).Error; err != nil {
 		t.Errorf("[Error] Cannot create droneStates: %v", err)
 	}
@@ -38,7 +38,7 @@ func TestDroneSuccessfulCreation(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				drone: entity.Drone{
-					SerielNumber:    "khiehbe0473b84n",
+					SerielNumber:    generateRandomText(14),
 					DroneModelID:    droneModels[0].ID,
 					WeightLimit:     400,
 					BatteryCapacity: 60,
@@ -51,7 +51,7 @@ func TestDroneSuccessfulCreation(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				drone: entity.Drone{
-					SerielNumber:    "sdhi8453jble9y0",
+					SerielNumber:    generateRandomText(14),
 					DroneModelID:    droneModels[1].ID,
 					WeightLimit:     500,
 					BatteryCapacity: 90,
@@ -74,6 +74,122 @@ func TestDroneSuccessfulCreation(t *testing.T) {
 			assert.Equal(t, drone.WeightLimit, tt.args.drone.WeightLimit)
 			assert.Equal(t, drone.BatteryCapacity, tt.args.drone.BatteryCapacity)
 			assert.Equal(t, drone.DroneStateID, tt.args.drone.DroneStateID)
+		})
+	}
+
+}
+
+func TestRightDroneDataRetrivalUsingID(t *testing.T) {
+	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
+	if err != nil {
+		t.Skipf("[Error] failed to connect to database: %v", err)
+	}
+	TruncateDB(dbClient)
+	droneModels := []entity.DroneModel{{Name: "modelOne"}, {Name: "modelTwo"}}
+	if err := dbClient.Create(&droneModels).Error; err != nil {
+		t.Errorf("[Error] Cannot create droneModels: %v", err)
+	}
+	droneStates := []entity.DroneState{{Name: "stateOne"}, {Name: "stateTwo"}}
+	if err := dbClient.Create(&droneStates).Error; err != nil {
+		t.Errorf("[Error] Cannot create droneStates: %v", err)
+	}
+	drones := []entity.Drone{
+		{
+			SerielNumber:    generateRandomText(20),
+			DroneModelID:    droneModels[0].ID,
+			WeightLimit:     400,
+			BatteryCapacity: 60,
+			DroneStateID:    droneStates[0].ID,
+		},
+		{
+			SerielNumber:    generateRandomText(21),
+			DroneModelID:    droneModels[1].ID,
+			WeightLimit:     500,
+			BatteryCapacity: 90,
+			DroneStateID:    droneStates[1].ID,
+		},
+	}
+	if err := dbClient.Create(&drones).Error; err != nil {
+		t.Errorf("[Error] Cannot create drones: %v", err)
+	}
+	var medications = []entity.Medication{
+		{
+			Name:    "med1",
+			Code:    generateRandomText(12),
+			Weight:  50,
+			DroneID: drones[0].ID,
+		},
+		{
+			Name:    "med2",
+			Code:    generateRandomText(12),
+			Weight:  100,
+			DroneID: drones[0].ID,
+		},
+		{
+			Name:    "med3",
+			Code:    generateRandomText(12),
+			Weight:  150,
+			DroneID: drones[1].ID,
+		},
+		{
+			Name:    "med4",
+			Code:    generateRandomText(12),
+			Weight:  200,
+			DroneID: drones[1].ID,
+		},
+	}
+
+	if result := dbClient.Create(&medications); result.Error != nil {
+		t.Errorf("[Error] Cannot create medications: %v", err)
+	}
+	var medicationsIDs []uint
+	for _, med := range medications {
+		medicationsIDs = append(medicationsIDs, med.ID)
+	}
+	droneRepository := repository.NewDroneRepository(dbClient)
+	type args struct {
+		ctx context.Context
+		ID  uint
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "[Test 1] test retrieve correct drone data when calling dronerepo GetByID method",
+			args: args{
+				ctx: context.Background(),
+				ID:  drones[0].ID,
+			},
+		},
+		{
+			name: "[Test 2] test retrieve correct drone data when calling dronerepo GetByID method",
+			args: args{
+				ctx: context.Background(),
+				ID:  drones[1].ID,
+			},
+		},
+	}
+
+	for index, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			drone, err := droneRepository.GetByID(tt.args.ctx, tt.args.ID)
+			if err != nil {
+				t.Errorf("[Error] Cannot retrive drone data: %v", err)
+			}
+			assert.Equal(t, drone.ID, drones[index].ID)
+			assert.Equal(t, drone.SerielNumber, drones[index].SerielNumber)
+			assert.Equal(t, drone.DroneModelID, drones[index].DroneModelID)
+			assert.Equal(t, drone.WeightLimit, drones[index].WeightLimit)
+			assert.Equal(t, drone.BatteryCapacity, drones[index].BatteryCapacity)
+			assert.Equal(t, drone.DroneStateID, drones[index].DroneStateID)
+			// deepEqual
+			assert.Equal(t, drone.DroneModel, droneModels[index])
+			assert.Equal(t, drone.DroneState, droneStates[index])
+			var expextedMeds []entity.Medication
+			dbClient.Find(&expextedMeds, medicationsIDs[index*2:index*2+2])
+			assert.Equal(t, drone.Medications, expextedMeds)
+
 		})
 	}
 

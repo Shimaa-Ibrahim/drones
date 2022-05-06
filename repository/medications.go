@@ -8,14 +8,14 @@ import (
 )
 
 type MedicationRepoProto interface {
-	LoadMedicationsBatchUpdates(ctx context.Context, droneID uint, medicationsIDs []uint) error
+	UpdateMedicationsWithDroneID(ctx context.Context, droneID uint, medicationsIDs []uint) error
 }
 
 type MedicationRepo struct {
 	client *gorm.DB
 }
 
-func NewMedicationRepository(client *gorm.DB) *MedicationRepo {
+func NewMedicationRepository(client *gorm.DB) MedicationRepoProto {
 	return &MedicationRepo{client: client}
 }
 
