@@ -4,9 +4,9 @@ import "gorm.io/gorm"
 
 type Medication struct {
 	gorm.Model
-	Name      string `gorm:"not null"`
-	Code      string `gorm:"not null"`
-	Weight    string `gorm:"not null"`
+	Name      string  `gorm:"not null"`
+	Code      string  `gorm:"not null"`
+	Weight    float64 `gorm:"not null"`
 	ImagePath string
-	DroneID   uint
+	DroneID   uint `gorm:"default:null"`
 }

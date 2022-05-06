@@ -11,15 +11,19 @@ import (
 )
 
 func TestDroneSuccessfulCreation(t *testing.T) {
-	var droneModels []entity.DroneModel
-	var droneStates []entity.DroneState
+	droneModels := []entity.DroneModel{{Name: generateRandomText(20)}, {Name: generateRandomText(20)}}
+	droneStates := []entity.DroneState{{Name: generateRandomText(20)}, {Name: generateRandomText(20)}}
 	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
 	if err != nil {
 		t.Skipf("[Error] failed to connect to database: %v", err)
 	}
 	TruncateDB(dbClient)
-	dbClient.Find(&droneModels, "name IN (?, ?)", "Lightweight", "Cruiserweight")
-	dbClient.Find(&droneStates, "name IN (?, ?)", "LOADING", "RETURNING")
+	if err := dbClient.Create(&droneModels).Error; err != nil {
+		t.Errorf("[Error] Cannot create droneModels: %v", err)
+	}
+	if err := dbClient.Create(&droneStates).Error; err != nil {
+		t.Errorf("[Error] Cannot create droneStates: %v", err)
+	}
 	droneRepository := repository.NewDroneRepository(dbClient)
 	type args struct {
 		ctx   context.Context

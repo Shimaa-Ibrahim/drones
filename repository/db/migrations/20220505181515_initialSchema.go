@@ -18,9 +18,9 @@ func Up_20220505181515(txn *gorm.DB) {
 
 	type Medication struct {
 		gorm.Model
-		Name      string `gorm:"not null"`
-		Code      string `gorm:"not null"`
-		Weight    string `gorm:"not null"`
+		Name      string  `gorm:"not null"`
+		Code      string  `gorm:"not null"`
+		Weight    float64 `gorm:"not null"`
 		ImagePath string
 		DroneID   uint
 	}
