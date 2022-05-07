@@ -13,7 +13,7 @@ import (
 func TestLoadingDroneWithMedicationsBatchUpdates(t *testing.T) {
 	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
 	if err != nil {
-		t.Skipf("[Error] failed to connect to database: %v", err)
+		t.Fatalf("[Error] failed to connect to database: %v", err)
 	}
 	TruncateDB(dbClient)
 	drone := entity.Drone{

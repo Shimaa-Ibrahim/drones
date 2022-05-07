@@ -13,7 +13,7 @@ import (
 func TestDroneSuccessfulCreation(t *testing.T) {
 	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
 	if err != nil {
-		t.Skipf("[Error] failed to connect to database: %v", err)
+		t.Fatalf("[Error] failed to connect to database: %v", err)
 	}
 	TruncateDB(dbClient)
 	droneModels := []entity.DroneModel{{Name: "modelOne"}, {Name: "modelTwo"}}
@@ -82,7 +82,7 @@ func TestDroneSuccessfulCreation(t *testing.T) {
 func TestRightDroneDataRetrivalUsingID(t *testing.T) {
 	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
 	if err != nil {
-		t.Skipf("[Error] failed to connect to database: %v", err)
+		t.Fatalf("[Error] failed to connect to database: %v", err)
 	}
 	TruncateDB(dbClient)
 	droneModels := []entity.DroneModel{{Name: "modelOne"}, {Name: "modelTwo"}}
@@ -198,7 +198,7 @@ func TestRightDroneDataRetrivalUsingID(t *testing.T) {
 func TestRightDronesAvailableForLoadingRetrival(t *testing.T) {
 	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
 	if err != nil {
-		t.Skipf("[Error] failed to connect to database: %v", err)
+		t.Fatalf("[Error] failed to connect to database: %v", err)
 	}
 	TruncateDB(dbClient)
 	droneStates := []entity.DroneState{{Name: "LOADING"}, {Name: "DELIVERING"}, {Name: "LOADED"}}
