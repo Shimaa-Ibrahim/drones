@@ -50,7 +50,7 @@ func TestLoadingDroneWithMedicationsBatchUpdates(t *testing.T) {
 		},
 	}
 
-	if result := dbClient.Create(&medications); result.Error != nil {
+	if result := dbClient.Omit("DroneID").Create(&medications); result.Error != nil {
 		t.Errorf("[Error] Cannot create medications: %v", err)
 	}
 

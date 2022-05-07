@@ -187,10 +187,121 @@ func TestRightDroneDataRetrivalUsingID(t *testing.T) {
 			assert.Equal(t, drone.DroneModel, droneModels[index])
 			assert.Equal(t, drone.DroneState, droneStates[index])
 			var expextedMeds []entity.Medication
-			dbClient.Find(&expextedMeds, medicationsIDs[index*2:index*2+2])
+			dbClient.Order("id").Find(&expextedMeds, medicationsIDs[index*2:index*2+2])
 			assert.Equal(t, drone.Medications, expextedMeds)
 
 		})
 	}
+
+}
+
+func TestRightDronesAvailableForLoadingRetrival(t *testing.T) {
+	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
+	if err != nil {
+		t.Skipf("[Error] failed to connect to database: %v", err)
+	}
+	TruncateDB(dbClient)
+	droneStates := []entity.DroneState{{Name: "LOADING"}, {Name: "DELIVERING"}, {Name: "LOADED"}}
+	if err := dbClient.Create(&droneStates).Error; err != nil {
+		t.Errorf("[Error] Cannot create droneStates: %v", err)
+	}
+	drones := []entity.Drone{
+		{
+			SerielNumber:    generateRandomText(20),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(20)},
+			WeightLimit:     500,
+			BatteryCapacity: 80,
+			DroneStateID:    droneStates[0].ID,
+		},
+		{
+			SerielNumber:    generateRandomText(20),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(21)},
+			WeightLimit:     300,
+			BatteryCapacity: 45,
+			DroneStateID:    droneStates[0].ID,
+		},
+		{
+			SerielNumber:    generateRandomText(21),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(22)},
+			WeightLimit:     100, // won't appear limited weight
+			BatteryCapacity: 90,
+			DroneStateID:    droneStates[0].ID,
+		},
+		{
+			SerielNumber:    generateRandomText(21),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(23)},
+			WeightLimit:     400,
+			BatteryCapacity: 20, // won't appear battery level < 25%
+			DroneStateID:    droneStates[0].ID,
+		},
+		{
+			SerielNumber:    generateRandomText(21),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(24)},
+			WeightLimit:     500,
+			BatteryCapacity: 90,
+			DroneStateID:    droneStates[1].ID, // won't appear not in Loading state
+		},
+		{
+			SerielNumber:    generateRandomText(21),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(25)},
+			WeightLimit:     500,
+			BatteryCapacity: 90,
+			DroneStateID:    droneStates[2].ID, // won't appear not in Loading state
+		},
+	}
+	if err := dbClient.Create(&drones).Error; err != nil {
+		t.Errorf("[Error] Cannot create drones: %v", err)
+	}
+	var medications = []entity.Medication{
+		{
+			Name:    "med1",
+			Code:    generateRandomText(12),
+			Weight:  50,
+			DroneID: drones[0].ID,
+		},
+		{
+			Name:    "med2",
+			Code:    generateRandomText(12),
+			Weight:  120,
+			DroneID: drones[0].ID,
+		},
+		{
+			Name:    "med3",
+			Code:    generateRandomText(12),
+			Weight:  100,
+			DroneID: drones[2].ID,
+		},
+		{
+			Name:    "med4",
+			Code:    generateRandomText(12),
+			Weight:  200,
+			DroneID: drones[1].ID,
+		},
+	}
+
+	if result := dbClient.Create(&medications); result.Error != nil {
+		t.Errorf("[Error] Cannot create medications: %v", err)
+	}
+
+	droneRepository := repository.NewDroneRepository(dbClient)
+
+	t.Run("Test retrieve correct drones available for loading", func(t *testing.T) {
+		retrievedDrones, err := droneRepository.GetDronesAvailableForLoading(context.Background())
+		if err != nil {
+			t.Errorf("[Error] Cannot retrive drone data: %v", err)
+		}
+		expectedDrones := drones[0:2]
+		for index, drone := range retrievedDrones {
+			assert.Equal(t, drone.ID, expectedDrones[index].ID)
+			assert.Equal(t, drone.SerielNumber, expectedDrones[index].SerielNumber)
+			assert.Equal(t, drone.DroneState, droneStates[0])
+			assert.Equal(t, drone.DroneStateID, expectedDrones[index].DroneStateID)
+			assert.Equal(t, drone.DroneModel, expectedDrones[index].DroneModel)
+			assert.Equal(t, drone.DroneModelID, expectedDrones[index].DroneModelID)
+			assert.Equal(t, drone.BatteryCapacity, expectedDrones[index].BatteryCapacity)
+			assert.Equal(t, drone.WeightLimit, expectedDrones[index].WeightLimit)
+		}
+
+	})
 
 }

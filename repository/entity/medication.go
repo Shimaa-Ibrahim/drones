@@ -8,5 +8,5 @@ type Medication struct {
 	Code      string  `gorm:"not null"`
 	Weight    float64 `gorm:"not null"`
 	ImagePath string
-	DroneID   uint `gorm:"default:null"`
+	DroneID   uint //`gorm:"default:null"`
 }
