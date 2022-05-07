@@ -37,6 +37,19 @@ func (ddb MokedDroneRepo) GetByID(ctx context.Context, id uint) (entity.Drone, e
 			WeightLimit:     500,
 			BatteryCapacity: 80,
 			DroneState:      entity.DroneState{Name: "LOADING"},
+			Medications: []entity.Medication{
+				{
+					Name:   "med1",
+					Code:   "veop45tgem",
+					Weight: 50,
+				},
+				{
+					Name:      "med2",
+					Code:      "veop45tgem",
+					Weight:    50,
+					ImagePath: "vklitjr0g5enrbif x",
+				},
+			},
 		}, nil
 	default:
 		return entity.Drone{

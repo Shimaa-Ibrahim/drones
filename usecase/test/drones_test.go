@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github/Shimaa-Ibrahim/grones/repository/entity"
 	"github/Shimaa-Ibrahim/grones/repository/mocks"
 	"github/Shimaa-Ibrahim/grones/usecase"
@@ -40,4 +41,29 @@ func TestDroneSuccessfulRegisteration(t *testing.T) {
 		assert.Equal(t, registeredDrone, drone)
 
 	})
+}
+
+func TestCheckingLoadedItemsForGivenDrone(t *testing.T) {
+	mockedDroneRepository := mocks.NewMockedDroneRepository()
+	droneUseCase := usecase.NewDroneUseCase(mockedDroneRepository)
+	dronesIDs := []uint{1, 2}
+	var expectDrones []entity.Drone
+	for _, id := range dronesIDs {
+		drone, _ := mockedDroneRepository.GetByID(context.Background(), id)
+		expectDrones = append(expectDrones, drone)
+	}
+	for index, id := range dronesIDs {
+		t.Run(fmt.Sprintf("Test retrive right medication data for given drone of id %v", id), func(t *testing.T) {
+			retievedDrone, err := droneUseCase.CheckDroneLoadedItem(context.Background(), id)
+			if err != nil {
+				t.Errorf("Cannot retrieve drone data")
+			}
+			drone := entity.Drone{}
+			if err := json.Unmarshal(retievedDrone, &drone); err != nil {
+				t.Fatalf("cannot unmarshal drone data: %v", err)
+			}
+			assert.Equal(t, drone, expectDrones[index])
+		})
+	}
+
 }

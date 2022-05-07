@@ -9,6 +9,7 @@ import (
 
 type DroneUseCaseProto interface {
 	RegisterDrone(ctx context.Context, request []byte) ([]byte, error)
+	CheckDroneLoadedItem(ctx context.Context, id uint) ([]byte, error)
 }
 
 type DroneUseCase struct {
@@ -29,5 +30,14 @@ func (d DroneUseCase) RegisterDrone(ctx context.Context, request []byte) ([]byte
 		return []byte{}, err
 	}
 
+	return json.Marshal(drone)
+}
+
+func (d DroneUseCase) CheckDroneLoadedItem(ctx context.Context, id uint) ([]byte, error) {
+	drone := entity.Drone{}
+	drone, err := d.droneRepository.GetByID(ctx, id)
+	if err != nil {
+		return []byte{}, err
+	}
 	return json.Marshal(drone)
 }
