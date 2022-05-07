@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"fmt"
 	"github/Shimaa-Ibrahim/grones/repository"
 	"github/Shimaa-Ibrahim/grones/repository/db"
 	"github/Shimaa-Ibrahim/grones/repository/entity"
@@ -76,5 +77,60 @@ func TestLoadingDroneWithMedicationsBatchUpdates(t *testing.T) {
 		}
 
 	})
+
+}
+
+func TestRightMedicationDataRetrivalUsingID(t *testing.T) {
+	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
+	if err != nil {
+		t.Fatalf("[Error] failed to connect to database: %v", err)
+	}
+	TruncateDB(dbClient)
+	var medications = []entity.Medication{
+		{
+			Name:   "med1",
+			Code:   generateRandomText(12),
+			Weight: 50,
+		},
+		{
+			Name:   "med2",
+			Code:   generateRandomText(12),
+			Weight: 100,
+		},
+		{
+			Name:   "med3",
+			Code:   generateRandomText(12),
+			Weight: 150,
+		},
+		{
+			Name:   "med4",
+			Code:   generateRandomText(12),
+			Weight: 200,
+		},
+	}
+
+	if result := dbClient.Omit("DroneID").Create(&medications); result.Error != nil {
+		t.Errorf("[Error] Cannot create medications: %v", err)
+	}
+
+	var medicationsIDs []uint
+	for _, med := range medications {
+		medicationsIDs = append(medicationsIDs, med.ID)
+	}
+
+	medicationRepository := repository.NewMedicationRepository(dbClient)
+	var expextedMeds []entity.Medication
+	dbClient.Find(&expextedMeds, medicationsIDs)
+
+	for index, medication := range expextedMeds {
+		t.Run(fmt.Sprintf("Test right data retrival for medication %v", index), func(t *testing.T) {
+			retrievedMedication, err := medicationRepository.GetByID(context.Background(), medication.ID)
+			if err != nil {
+				t.Errorf("[Error] Cannot retrive medication data: %v", err)
+			}
+			assert.Equal(t, retrievedMedication, medication)
+
+		})
+	}
 
 }
