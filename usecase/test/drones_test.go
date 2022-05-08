@@ -56,14 +56,30 @@ func TestCheckingLoadedItemsForGivenDrone(t *testing.T) {
 		t.Run(fmt.Sprintf("Test retrive right medication data for given drone of id %v", id), func(t *testing.T) {
 			retievedDrone, err := droneUseCase.CheckDroneLoadedItem(context.Background(), id)
 			if err != nil {
-				t.Errorf("Cannot retrieve drone data")
+				t.Errorf("[Error] Cannot retrieve drone data: %v", err)
 			}
 			drone := entity.Drone{}
 			if err := json.Unmarshal(retievedDrone, &drone); err != nil {
-				t.Fatalf("cannot unmarshal drone data: %v", err)
+				t.Fatalf("[Error] Cannot unmarshal drone data: %v", err)
 			}
 			assert.Equal(t, drone, expectDrones[index])
 		})
 	}
+
+}
+
+func TestCheckingAvailableDronesForLoading(t *testing.T) {
+	mockedDroneRepository := mocks.NewMockedDroneRepository()
+	droneUseCase := usecase.NewDroneUseCase(mockedDroneRepository)
+	expectAvailableDrones, _ := mockedDroneRepository.GetDronesAvailableForLoading(context.Background())
+	retrievedDrones, err := droneUseCase.GetDronesAvailableForLoading(context.Background())
+	if err != nil {
+		t.Errorf("[Error] Cannot retrieve available drones: %v", err)
+	}
+	drones := []entity.Drone{}
+	if err := json.Unmarshal(retrievedDrones, &drones); err != nil {
+		t.Fatalf("[Error] Cannot unmarshal drone data: %v", err)
+	}
+	assert.Equal(t, drones, expectAvailableDrones)
 
 }
