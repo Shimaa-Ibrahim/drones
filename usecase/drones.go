@@ -4,13 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"github/Shimaa-Ibrahim/grones/repository"
-	"github/Shimaa-Ibrahim/grones/repository/entity"
+	repoEntity "github/Shimaa-Ibrahim/grones/repository/entity"
+	"github/Shimaa-Ibrahim/grones/usecase/entity"
 )
 
 type DroneUseCaseProto interface {
 	RegisterDrone(ctx context.Context, request []byte) ([]byte, error)
 	CheckDroneLoadedItem(ctx context.Context, id uint) ([]byte, error)
 	GetDronesAvailableForLoading(context.Context) ([]byte, error)
+	CheckDroneBatteryLevel(context.Context, uint) ([]byte, error)
 }
 
 type DroneUseCase struct {
@@ -22,7 +24,7 @@ func NewDroneUseCase(droneRepository repository.DroneRepoProto) DroneUseCaseProt
 }
 
 func (d DroneUseCase) RegisterDrone(ctx context.Context, request []byte) ([]byte, error) {
-	drone := entity.Drone{}
+	drone := repoEntity.Drone{}
 	if err := json.Unmarshal(request, &drone); err != nil {
 		return []byte{}, err
 	}
@@ -48,5 +50,18 @@ func (d DroneUseCase) GetDronesAvailableForLoading(ctx context.Context) ([]byte,
 		return []byte{}, err
 	}
 	return json.Marshal(drone)
+
+}
+
+func (d DroneUseCase) CheckDroneBatteryLevel(ctx context.Context, id uint) ([]byte, error) {
+	drone, err := d.droneRepository.GetByID(ctx, id)
+	if err != nil {
+		return []byte{}, err
+	}
+	batteryLevel := entity.BatteryLevelResponse{
+		DroneID:      drone.ID,
+		BatteryLevel: drone.BatteryCapacity,
+	}
+	return json.Marshal(batteryLevel)
 
 }

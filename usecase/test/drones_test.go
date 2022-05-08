@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github/Shimaa-Ibrahim/grones/repository/entity"
+	repoEntity "github/Shimaa-Ibrahim/grones/repository/entity"
 	"github/Shimaa-Ibrahim/grones/repository/mocks"
 	"github/Shimaa-Ibrahim/grones/usecase"
+	"github/Shimaa-Ibrahim/grones/usecase/entity"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,12 +30,12 @@ func TestDroneSuccessfulRegisteration(t *testing.T) {
 		if err != nil {
 			t.Errorf("[Error] Cannot create drone: %v", err)
 		}
-		var drone entity.Drone
+		var drone repoEntity.Drone
 		if err := json.Unmarshal(droneBytes, &drone); err != nil {
 			t.Fatalf("[Error] Cannot  Unmarshal: %v", err)
 		}
 
-		var registeredDrone entity.Drone
+		var registeredDrone repoEntity.Drone
 		if err := json.Unmarshal(retrievedDroneBytes, &registeredDrone); err != nil {
 			t.Fatalf("[Error] Cannot  Unmarshal: %v", err)
 		}
@@ -47,7 +48,7 @@ func TestCheckingLoadedItemsForGivenDrone(t *testing.T) {
 	mockedDroneRepository := mocks.NewMockedDroneRepository()
 	droneUseCase := usecase.NewDroneUseCase(mockedDroneRepository)
 	dronesIDs := []uint{1, 2}
-	var expectDrones []entity.Drone
+	var expectDrones []repoEntity.Drone
 	for _, id := range dronesIDs {
 		drone, _ := mockedDroneRepository.GetByID(context.Background(), id)
 		expectDrones = append(expectDrones, drone)
@@ -58,7 +59,7 @@ func TestCheckingLoadedItemsForGivenDrone(t *testing.T) {
 			if err != nil {
 				t.Errorf("[Error] Cannot retrieve drone data: %v", err)
 			}
-			drone := entity.Drone{}
+			drone := repoEntity.Drone{}
 			if err := json.Unmarshal(retievedDrone, &drone); err != nil {
 				t.Fatalf("[Error] Cannot unmarshal drone data: %v", err)
 			}
@@ -76,10 +77,31 @@ func TestCheckingAvailableDronesForLoading(t *testing.T) {
 	if err != nil {
 		t.Errorf("[Error] Cannot retrieve available drones: %v", err)
 	}
-	drones := []entity.Drone{}
+	drones := []repoEntity.Drone{}
 	if err := json.Unmarshal(retrievedDrones, &drones); err != nil {
 		t.Fatalf("[Error] Cannot unmarshal drone data: %v", err)
 	}
 	assert.Equal(t, drones, expectAvailableDrones)
+
+}
+
+func TestCheckingDroneBatteryLevel(t *testing.T) {
+	mockedDroneRepository := mocks.NewMockedDroneRepository()
+	droneUseCase := usecase.NewDroneUseCase(mockedDroneRepository)
+	expectedBatteryLevels := []uint64{80, 90, 20}
+	dronesIDs := []uint{1, 2, 3}
+	for index, id := range dronesIDs {
+		t.Run(fmt.Sprintf("Test retrive battery level for given drone of id %v", id), func(t *testing.T) {
+			retrivedBatteryLevel, err := droneUseCase.CheckDroneBatteryLevel(context.Background(), id)
+			if err != nil {
+				t.Errorf("[Error] Cannot retrieve batteryLevel: %v", err)
+			}
+			batteryLevel := entity.BatteryLevelResponse{}
+			if err := json.Unmarshal(retrivedBatteryLevel, &batteryLevel); err != nil {
+				t.Fatalf("[Error] Cannot unmarshal batteryLevel data: %v", err)
+			}
+			assert.Equal(t, batteryLevel.BatteryLevel, expectedBatteryLevels[index])
+		})
+	}
 
 }
