@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github/Shimaa-Ibrahim/grones/repository"
 	repoEntity "github/Shimaa-Ibrahim/grones/repository/entity"
 	"github/Shimaa-Ibrahim/grones/repository/mocks"
 	"github/Shimaa-Ibrahim/grones/usecase"
@@ -12,6 +13,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
+
+var mockedDroneRepository repository.DroneRepoProto
+var droneUseCase usecase.DroneUseCaseProto
+
+func init() {
+	mockedDroneRepository = mocks.NewMockedDroneRepository()
+	droneUseCase = usecase.NewDroneUseCase(mockedDroneRepository)
+}
 
 func TestDroneSuccessfulRegisteration(t *testing.T) {
 	droneBytes := []byte(`{
@@ -22,9 +31,6 @@ func TestDroneSuccessfulRegisteration(t *testing.T) {
 		"drone_state_id": 1
 		
 	}`)
-
-	mockedDroneRepository := mocks.NewMockedDroneRepository()
-	droneUseCase := usecase.NewDroneUseCase(mockedDroneRepository)
 	t.Run("Test successful drone registeration", func(t *testing.T) {
 		retrievedDroneBytes, err := droneUseCase.RegisterDrone(context.Background(), droneBytes)
 		if err != nil {
@@ -45,8 +51,6 @@ func TestDroneSuccessfulRegisteration(t *testing.T) {
 }
 
 func TestCheckingLoadedItemsForGivenDrone(t *testing.T) {
-	mockedDroneRepository := mocks.NewMockedDroneRepository()
-	droneUseCase := usecase.NewDroneUseCase(mockedDroneRepository)
 	dronesIDs := []uint{1, 2}
 	var expectDrones []repoEntity.Drone
 	for _, id := range dronesIDs {
@@ -70,8 +74,6 @@ func TestCheckingLoadedItemsForGivenDrone(t *testing.T) {
 }
 
 func TestCheckingAvailableDronesForLoading(t *testing.T) {
-	mockedDroneRepository := mocks.NewMockedDroneRepository()
-	droneUseCase := usecase.NewDroneUseCase(mockedDroneRepository)
 	expectAvailableDrones, _ := mockedDroneRepository.GetDronesAvailableForLoading(context.Background())
 	retrievedDrones, err := droneUseCase.GetDronesAvailableForLoading(context.Background())
 	if err != nil {
@@ -86,8 +88,6 @@ func TestCheckingAvailableDronesForLoading(t *testing.T) {
 }
 
 func TestCheckingDroneBatteryLevel(t *testing.T) {
-	mockedDroneRepository := mocks.NewMockedDroneRepository()
-	droneUseCase := usecase.NewDroneUseCase(mockedDroneRepository)
 	expectedBatteryLevels := []uint64{80, 90, 20}
 	dronesIDs := []uint{1, 2, 3}
 	for index, id := range dronesIDs {
