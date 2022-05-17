@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,4 +58,31 @@ func TestDroneRegisterTroughAPI(t *testing.T) {
 	assert.Equal(t, drone.WeightLimit, uint64(500))
 	assert.Equal(t, drone.BatteryCapacity, uint64(75))
 	assert.Equal(t, drone.DroneStateID, uint(1))
+}
+
+func TestCheckDroneLoadedItemTroughAPI(t *testing.T) {
+	apiURL := "/drone/checkdroneloaded/1/"
+	req, err := http.NewRequest("GET", apiURL, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router := mux.NewRouter()
+	router.HandleFunc("/drone/checkdroneloaded/{id}/", droneAPI.CheckDroneLoadedItem)
+	router.ServeHTTP(rr, req)
+	result := rr.Body.String()
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("Wrong status code: got %v want %v", status, http.StatusOK)
+	}
+	drone := entity.Drone{}
+	if err := json.Unmarshal([]byte(result), &drone); err != nil {
+		t.Fatalf("[Error] Cannot  Unmarshal: %v", err)
+	}
+
+	expectedDrone, err := droneRepository.GetByID(req.Context(), uint(1))
+	if err := json.Unmarshal([]byte(result), &drone); err != nil {
+		t.Fatalf("[Error] Cannot  retrieve expected data: %v", err)
+	}
+
+	assert.Equal(t, drone, expectedDrone)
 }
