@@ -86,3 +86,28 @@ func TestCheckDroneLoadedItemTroughAPI(t *testing.T) {
 
 	assert.Equal(t, drone, expectedDrone)
 }
+
+func TestGetDronesAvailableForLoadingAPI(t *testing.T) {
+	apiURL := "/drone/availabledrones/"
+	req, err := http.NewRequest("GET", apiURL, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(droneAPI.GetDronesAvailableForLoading)
+	handler.ServeHTTP(rr, req)
+	result := rr.Body.String()
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("Wrong status code: got %v want %v", status, http.StatusOK)
+	}
+	availableDrones := []entity.Drone{}
+	if err := json.Unmarshal([]byte(result), &availableDrones); err != nil {
+		t.Fatalf("[Error] Cannot  Unmarshal: %v", err)
+	}
+
+	expectedDrones, err := droneRepository.GetDronesAvailableForLoading(req.Context())
+	if err := json.Unmarshal([]byte(result), &expectedDrones); err != nil {
+		t.Fatalf("[Error] Cannot  retrieve expected data: %v", err)
+	}
+	assert.Equal(t, availableDrones, expectedDrones)
+}

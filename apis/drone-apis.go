@@ -65,3 +65,16 @@ func (api DroneAPIs) CheckDroneLoadedItem(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
 }
+
+func (api DroneAPIs) GetDronesAvailableForLoading(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	response, err := api.droneUseCase.GetDronesAvailableForLoading(ctx)
+	if err != nil {
+		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
+}
