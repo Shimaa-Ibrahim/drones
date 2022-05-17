@@ -24,6 +24,7 @@ func (ddb MokedDroneRepo) GetByID(ctx context.Context, id uint) (entity.Drone, e
 		return entity.Drone{}, gorm.ErrRecordNotFound
 	case 1:
 		return entity.Drone{
+			Model:           gorm.Model{ID: 1},
 			SerielNumber:    "ldrefmweoflmj956flfrv2",
 			DroneModel:      entity.DroneModel{Name: "Heavyweight"},
 			WeightLimit:     500,

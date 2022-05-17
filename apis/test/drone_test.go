@@ -8,6 +8,8 @@ import (
 	"github/Shimaa-Ibrahim/grones/repository/entity"
 	"github/Shimaa-Ibrahim/grones/repository/mocks"
 	"github/Shimaa-Ibrahim/grones/usecase"
+	usecaseEntity "github/Shimaa-Ibrahim/grones/usecase/entity"
+
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -110,4 +112,28 @@ func TestGetDronesAvailableForLoadingAPI(t *testing.T) {
 		t.Fatalf("[Error] Cannot  retrieve expected data: %v", err)
 	}
 	assert.Equal(t, availableDrones, expectedDrones)
+}
+
+func TestCheckDroneBatteryLevelAPI(t *testing.T) {
+	apiURL := "/drone/checkbattery/1/"
+	req, err := http.NewRequest("GET", apiURL, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router := mux.NewRouter()
+	router.HandleFunc("/drone/checkbattery/{id}/", droneAPI.CheckDroneBatteryLevel)
+	router.ServeHTTP(rr, req)
+	result := rr.Body.String()
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("Wrong status code: got %v want %v", status, http.StatusOK)
+	}
+	batteryLevel := usecaseEntity.BatteryLevelResponse{}
+	if err := json.Unmarshal([]byte(result), &batteryLevel); err != nil {
+		t.Fatalf("[Error] Cannot  Unmarshal: %v", err)
+	}
+
+	assert.Equal(t, batteryLevel.BatteryLevel, uint64(80))
+	assert.Equal(t, batteryLevel.DroneID, uint(1))
+
 }

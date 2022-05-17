@@ -78,3 +78,27 @@ func (api DroneAPIs) GetDronesAvailableForLoading(w http.ResponseWriter, r *http
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
 }
+
+func (api DroneAPIs) CheckDroneBatteryLevel(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	vars := mux.Vars(r)
+	pathID := vars["id"]
+	id, err := strconv.Atoi(pathID)
+	if err != nil {
+		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		return
+	}
+
+	response, err := api.droneUseCase.CheckDroneBatteryLevel(ctx, uint(id))
+	if err != nil {
+		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
+}
