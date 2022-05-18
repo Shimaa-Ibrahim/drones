@@ -305,3 +305,49 @@ func TestRightDronesAvailableForLoadingRetrival(t *testing.T) {
 	})
 
 }
+
+func TestDronesDataRetrival(t *testing.T) {
+	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
+	if err != nil {
+		t.Fatalf("[Error] failed to connect to database: %v", err)
+	}
+	TruncateDB(dbClient)
+	drones := []entity.Drone{
+		{
+			SerielNumber:    generateRandomText(20),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(20)},
+			WeightLimit:     400,
+			BatteryCapacity: 60,
+			DroneState:      entity.DroneState{Name: generateRandomText(20)},
+		},
+		{
+			SerielNumber:    generateRandomText(21),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(20)},
+			WeightLimit:     500,
+			BatteryCapacity: 90,
+			DroneState:      entity.DroneState{Name: generateRandomText(20)},
+		},
+	}
+	if err := dbClient.Create(&drones).Error; err != nil {
+		t.Errorf("[Error] Cannot create drones: %v", err)
+	}
+
+	droneRepository := repository.NewDroneRepository(dbClient)
+	t.Run("Test retrieve all Drone data", func(t *testing.T) {
+		retrievedDrones, err := droneRepository.Get(context.Background())
+		if err != nil {
+			t.Errorf("[Error] Cannot retrive drone data: %v", err)
+		}
+		for index, drone := range retrievedDrones {
+			assert.NotEmpty(t, drone.ID)
+			assert.Equal(t, drone.ID, drones[index].ID)
+			assert.Equal(t, drone.SerielNumber, drones[index].SerielNumber)
+			assert.Equal(t, drone.DroneModelID, drones[index].DroneModelID)
+			assert.Equal(t, drone.WeightLimit, drones[index].WeightLimit)
+			assert.Equal(t, drone.BatteryCapacity, drones[index].BatteryCapacity)
+			assert.Equal(t, drone.DroneStateID, drones[index].DroneStateID)
+		}
+
+	})
+
+}
