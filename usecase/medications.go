@@ -12,7 +12,7 @@ import (
 )
 
 type MedicationUseCaseProto interface {
-	LoadingDroneWithMedicationItems(ctx context.Context, request []byte) error
+	LoadDroneWithMedicationItems(ctx context.Context, request []byte) error
 }
 
 type MedicationUseCase struct {
@@ -27,7 +27,7 @@ func NewMedicationUseCase(medicationRepo repository.MedicationRepoProto, droneRe
 	}
 }
 
-func (m MedicationUseCase) LoadingDroneWithMedicationItems(ctx context.Context, request []byte) error {
+func (m MedicationUseCase) LoadDroneWithMedicationItems(ctx context.Context, request []byte) error {
 	droneMedicationsData := entity.DroneMedications{}
 	if err := json.Unmarshal(request, &droneMedicationsData); err != nil {
 		return err

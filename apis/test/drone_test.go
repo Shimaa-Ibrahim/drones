@@ -3,11 +3,7 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"github/Shimaa-Ibrahim/grones/apis"
-	"github/Shimaa-Ibrahim/grones/repository"
 	"github/Shimaa-Ibrahim/grones/repository/entity"
-	"github/Shimaa-Ibrahim/grones/repository/mocks"
-	"github/Shimaa-Ibrahim/grones/usecase"
 	usecaseEntity "github/Shimaa-Ibrahim/grones/usecase/entity"
 
 	"net/http"
@@ -17,17 +13,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 )
-
-var droneRepository repository.DroneRepoProto
-var droneUseCase usecase.DroneUseCaseProto
-var droneAPI apis.DroneAPIs
-
-func init() {
-	droneRepository = mocks.NewMockedDroneRepository()
-	droneUseCase = usecase.NewDroneUseCase(droneRepository)
-	droneAPI = apis.NewDroneAPI(droneUseCase)
-
-}
 
 func TestDroneRegisterTroughAPI(t *testing.T) {
 	apiURL := "/drone/register/"

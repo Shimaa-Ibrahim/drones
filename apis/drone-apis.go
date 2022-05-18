@@ -27,7 +27,7 @@ func (api DroneAPIs) RegisterDrone(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusBadRequest)
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		w.Write([]byte(fmt.Sprintf(`{ "error" : "%s"}`, err.Error())))
 		return
 	}
 
@@ -35,7 +35,7 @@ func (api DroneAPIs) RegisterDrone(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		w.Write([]byte(fmt.Sprintf(`{ "error" : "%s"}`, err.Error())))
 		return
 	}
 
@@ -51,7 +51,7 @@ func (api DroneAPIs) CheckDroneLoadedItem(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusBadRequest)
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		w.Write([]byte(fmt.Sprintf(`{ "error" : "%s"}`, err.Error())))
 		return
 	}
 
@@ -59,7 +59,7 @@ func (api DroneAPIs) CheckDroneLoadedItem(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		w.Write([]byte(fmt.Sprintf(`{ "error" : "%s"}`, err.Error())))
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -72,7 +72,7 @@ func (api DroneAPIs) GetDronesAvailableForLoading(w http.ResponseWriter, r *http
 	if err != nil {
 		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		w.Write([]byte(fmt.Sprintf(`{ "error" : "%s"}`, err.Error())))
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -87,7 +87,7 @@ func (api DroneAPIs) CheckDroneBatteryLevel(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusBadRequest)
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		w.Write([]byte(fmt.Sprintf(`{ "error" : "%s"}`, err.Error())))
 		return
 	}
 
@@ -95,7 +95,7 @@ func (api DroneAPIs) CheckDroneBatteryLevel(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		log.Printf("[Error]: %v ---- [status code] %v", err.Error(), http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf(`{[Error]: %s}`, err.Error())))
+		w.Write([]byte(fmt.Sprintf(`{ "error" : "%s"}`, err.Error())))
 		return
 	}
 
