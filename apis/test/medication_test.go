@@ -94,7 +94,7 @@ func TestFailureToLoadDroneWithMedicationItemsAPI(t *testing.T) {
 }
 
 func TestSuccssfulLoadingDroneWithMedicationItemsAPI(t *testing.T) {
-	apiURL := "/drone/register/"
+	apiURL := "/medications/load/"
 	data := []byte(`{"id": 2, "medications_ids": [1]}`)
 
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(data))
