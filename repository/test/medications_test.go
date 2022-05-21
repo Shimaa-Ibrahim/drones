@@ -134,3 +134,42 @@ func TestRightMedicationDataRetrivalUsingID(t *testing.T) {
 	}
 
 }
+
+func TestMedicationSuccessfulCreation(t *testing.T) {
+	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
+	if err != nil {
+		t.Fatalf("[Error] failed to connect to database: %v", err)
+	}
+	TruncateDB(dbClient)
+	medicationRepository := repository.NewMedicationRepository(dbClient)
+	var medications = []entity.Medication{
+		{
+			Name:   "med1",
+			Code:   generateRandomText(12),
+			Weight: 50,
+		},
+		{
+			Name:   "med2",
+			Code:   generateRandomText(12),
+			Weight: 100,
+		},
+	}
+
+	for index, medication := range medications {
+		t.Run(fmt.Sprintf("Test right data retrival for medication %v", index), func(t *testing.T) {
+			createdMedication, err := medicationRepository.CreateMedication(context.Background(), medication)
+			if err != nil {
+				t.Errorf("[Error] Cannot Create medication: %v", err)
+			}
+			retrievedMedication := entity.Medication{}
+			assert.NotEmpty(t, createdMedication.ID)
+			if err := dbClient.Find(&retrievedMedication, createdMedication.ID).Error; err != nil {
+				t.Errorf("[Error] Cannot retrive medication data: %v", err)
+			}
+			assert.Equal(t, retrievedMedication.Name, createdMedication.Name)
+			assert.Equal(t, retrievedMedication.Code, createdMedication.Code)
+			assert.Equal(t, retrievedMedication.Weight, createdMedication.Weight)
+		})
+	}
+
+}

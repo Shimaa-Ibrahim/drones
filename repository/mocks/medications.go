@@ -44,3 +44,7 @@ func (mdb MockedMedicationRepo) GetByID(ctx context.Context, id uint) (entity.Me
 
 	}
 }
+
+func (mdb MockedMedicationRepo) CreateMedication(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
+	return medication, nil
+}

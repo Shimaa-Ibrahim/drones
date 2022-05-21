@@ -10,6 +10,7 @@ import (
 type MedicationRepoProto interface {
 	UpdateMedicationsWithDroneID(ctx context.Context, droneID uint, medicationsIDs []uint) error
 	GetByID(ctx context.Context, id uint) (entity.Medication, error)
+	CreateMedication(ctx context.Context, medication entity.Medication) (entity.Medication, error)
 }
 
 type MedicationRepo struct {
@@ -29,4 +30,9 @@ func (mdb MedicationRepo) GetByID(ctx context.Context, id uint) (entity.Medicati
 	medication := entity.Medication{}
 	err := mdb.client.First(&medication, id).Error
 	return medication, err
+}
+
+func (mdb MedicationRepo) CreateMedication(ctx context.Context, medication entity.Medication) (entity.Medication, error) {
+	result := mdb.client.WithContext(ctx).Omit("DroneID").Create(&medication)
+	return medication, result.Error
 }
