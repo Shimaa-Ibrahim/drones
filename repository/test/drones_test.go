@@ -210,14 +210,14 @@ func TestRightDronesAvailableForLoadingRetrival(t *testing.T) {
 			SerielNumber:    generateRandomText(20),
 			DroneModel:      entity.DroneModel{Name: generateRandomText(20)},
 			WeightLimit:     500,
-			BatteryCapacity: 80,
+			BatteryCapacity: 90,
 			DroneStateID:    droneStates[0].ID,
 		},
 		{
 			SerielNumber:    generateRandomText(20),
 			DroneModel:      entity.DroneModel{Name: generateRandomText(21)},
 			WeightLimit:     300,
-			BatteryCapacity: 45,
+			BatteryCapacity: 25,
 			DroneStateID:    droneStates[0].ID,
 		},
 		{
@@ -231,7 +231,7 @@ func TestRightDronesAvailableForLoadingRetrival(t *testing.T) {
 			SerielNumber:    generateRandomText(21),
 			DroneModel:      entity.DroneModel{Name: generateRandomText(23)},
 			WeightLimit:     400,
-			BatteryCapacity: 20, // won't appear battery level < 25%
+			BatteryCapacity: 2, // won't appear battery level < 25%
 			DroneStateID:    droneStates[0].ID,
 		},
 		{
@@ -290,6 +290,8 @@ func TestRightDronesAvailableForLoadingRetrival(t *testing.T) {
 		if err != nil {
 			t.Errorf("[Error] Cannot retrive drone data: %v", err)
 		}
+
+		assert.Equal(t, len(retrievedDrones), 2)
 		expectedDrones := drones[0:2]
 		for index, drone := range retrievedDrones {
 			assert.Equal(t, drone.ID, expectedDrones[index].ID)

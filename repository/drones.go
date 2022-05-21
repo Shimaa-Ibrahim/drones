@@ -40,10 +40,10 @@ func (ddb DroneRepo) GetDronesAvailableForLoading(ctx context.Context) ([]entity
 	subQuery := ddb.client.Model(&entity.Medication{}).Select("SUM(weight) as loaded_weight, drone_id").Group("drone_id")
 	result := ddb.client.WithContext(ctx).
 		Joins("LEFT JOIN (?) sumResult ON sumResult.drone_id = drones.drones.id", subQuery).
-		Joins("JOIN drones.drone_states ON drones.drone_states.id = drones.drones.drone_state_id AND drones.drone_states.name = ?", "LOADING").
+		Joins(`JOIN drones.drone_states ON drones.drone_states.id = drones.drones.drone_state_id AND drones.drone_states.name = ?`, "LOADING").
 		Preload(clause.Associations).
 		Order("id").
-		Find(&drones, "battery_capacity >= ?", 25)
+		Find(&drones, "battery_capacity >= ? AND (drones.drones.weight_limit > sumResult.loaded_weight OR loaded_weight IS NULL)", 25)
 	return drones, result.Error
 }
 
