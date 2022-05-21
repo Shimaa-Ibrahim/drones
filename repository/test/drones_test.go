@@ -351,3 +351,54 @@ func TestDronesDataRetrival(t *testing.T) {
 	})
 
 }
+
+func TestLogDronesBatteryLevel(t *testing.T) {
+	dbClient, err := db.ConnectToDB(TEST_DRONE_DATABASE)
+	if err != nil {
+		t.Fatalf("[Error] failed to connect to database: %v", err)
+	}
+	TruncateDB(dbClient)
+	droneRepository := repository.NewDroneRepository(dbClient)
+	drones := []entity.Drone{
+		{
+			SerielNumber:    generateRandomText(20),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(20)},
+			WeightLimit:     400,
+			BatteryCapacity: 60,
+			DroneState:      entity.DroneState{Name: generateRandomText(20)},
+		},
+		{
+			SerielNumber:    generateRandomText(21),
+			DroneModel:      entity.DroneModel{Name: generateRandomText(20)},
+			WeightLimit:     500,
+			BatteryCapacity: 90,
+			DroneState:      entity.DroneState{Name: generateRandomText(20)},
+		},
+	}
+
+	if err := dbClient.Create(&drones).Error; err != nil {
+		t.Errorf("[Error] Cannot create drones: %v", err)
+	}
+
+	t.Run("Test retrieve all Drone data", func(t *testing.T) {
+		err := droneRepository.LogDronesBatteryLevel(context.Background())
+		if err != nil {
+			t.Errorf("[Error] Cannot log data: %v", err)
+		}
+
+		batteryLevelLogs := []entity.BatteryLevels{}
+
+		if err := dbClient.Find(&batteryLevelLogs).Error; err != nil {
+			t.Errorf("[Error] Cannot retrive battery logs data: %v", err)
+		}
+
+		assert.Equal(t, len(batteryLevelLogs), 2)
+		for index, batteryLevel := range batteryLevelLogs {
+			assert.NotEmpty(t, batteryLevel.ID)
+			assert.Equal(t, batteryLevel.DroneID, drones[index].ID)
+			assert.Equal(t, batteryLevel.BatteryLevel, float64(drones[index].BatteryCapacity))
+		}
+
+	})
+
+}
