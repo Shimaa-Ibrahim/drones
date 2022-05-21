@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"github/Shimaa-Ibrahim/grones/repository/entity"
+	"github/Shimaa-Ibrahim/drones/repository/entity"
 
 	"gorm.io/gorm"
 )

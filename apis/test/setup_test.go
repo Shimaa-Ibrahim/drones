@@ -1,10 +1,10 @@
 package test
 
 import (
-	"github/Shimaa-Ibrahim/grones/apis"
-	"github/Shimaa-Ibrahim/grones/repository"
-	"github/Shimaa-Ibrahim/grones/repository/mocks"
-	"github/Shimaa-Ibrahim/grones/usecase"
+	"github/Shimaa-Ibrahim/drones/apis"
+	"github/Shimaa-Ibrahim/drones/repository"
+	"github/Shimaa-Ibrahim/drones/repository/mocks"
+	"github/Shimaa-Ibrahim/drones/usecase"
 )
 
 var droneRepository repository.DroneRepoProto

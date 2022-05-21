@@ -2,8 +2,8 @@ package test
 
 import (
 	"context"
-	"github/Shimaa-Ibrahim/grones/repository/mocks"
-	"github/Shimaa-Ibrahim/grones/usecase"
+	"github/Shimaa-Ibrahim/drones/repository/mocks"
+	"github/Shimaa-Ibrahim/drones/usecase"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

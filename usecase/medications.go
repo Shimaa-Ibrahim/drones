@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github/Shimaa-Ibrahim/grones/repository"
-	"github/Shimaa-Ibrahim/grones/usecase/entity"
+	"github/Shimaa-Ibrahim/drones/repository"
+	"github/Shimaa-Ibrahim/drones/usecase/entity"
 
 	"gorm.io/gorm"
 )

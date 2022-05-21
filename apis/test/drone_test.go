@@ -3,8 +3,8 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"github/Shimaa-Ibrahim/grones/repository/entity"
-	usecaseEntity "github/Shimaa-Ibrahim/grones/usecase/entity"
+	"github/Shimaa-Ibrahim/drones/repository/entity"
+	usecaseEntity "github/Shimaa-Ibrahim/drones/usecase/entity"
 
 	"net/http"
 	"net/http/httptest"

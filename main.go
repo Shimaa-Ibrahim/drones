@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github/Shimaa-Ibrahim/grones/apis"
-	"github/Shimaa-Ibrahim/grones/repository"
-	"github/Shimaa-Ibrahim/grones/repository/db"
-	"github/Shimaa-Ibrahim/grones/server"
-	"github/Shimaa-Ibrahim/grones/usecase"
+	"github/Shimaa-Ibrahim/drones/apis"
+	"github/Shimaa-Ibrahim/drones/repository"
+	"github/Shimaa-Ibrahim/drones/repository/db"
+	"github/Shimaa-Ibrahim/drones/server"
+	"github/Shimaa-Ibrahim/drones/usecase"
 	"log"
 	"time"
 

@@ -1,4 +1,4 @@
-module github/Shimaa-Ibrahim/grones
+module github/Shimaa-Ibrahim/drones
 
 go 1.18
 

@@ -3,9 +3,9 @@ package test
 import (
 	"context"
 	"fmt"
-	"github/Shimaa-Ibrahim/grones/repository"
-	"github/Shimaa-Ibrahim/grones/repository/db"
-	"github/Shimaa-Ibrahim/grones/repository/entity"
+	"github/Shimaa-Ibrahim/drones/repository"
+	"github/Shimaa-Ibrahim/drones/repository/db"
+	"github/Shimaa-Ibrahim/drones/repository/entity"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

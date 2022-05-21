@@ -3,9 +3,9 @@ package usecase
 import (
 	"context"
 	"encoding/json"
-	"github/Shimaa-Ibrahim/grones/repository"
-	repoEntity "github/Shimaa-Ibrahim/grones/repository/entity"
-	"github/Shimaa-Ibrahim/grones/usecase/entity"
+	"github/Shimaa-Ibrahim/drones/repository"
+	repoEntity "github/Shimaa-Ibrahim/drones/repository/entity"
+	"github/Shimaa-Ibrahim/drones/usecase/entity"
 )
 
 type DroneUseCaseProto interface {

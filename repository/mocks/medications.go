@@ -3,8 +3,8 @@ package mocks
 import (
 	"context"
 	"errors"
-	"github/Shimaa-Ibrahim/grones/repository"
-	"github/Shimaa-Ibrahim/grones/repository/entity"
+	"github/Shimaa-Ibrahim/drones/repository"
+	"github/Shimaa-Ibrahim/drones/repository/entity"
 )
 
 type MockedMedicationRepo struct{}
