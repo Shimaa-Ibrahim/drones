@@ -101,6 +101,6 @@ func (ddb MokedDroneRepo) Get(ctx context.Context) ([]entity.Drone, error) {
 	}, nil
 }
 
-func (ddb MokedDroneRepo) LogDronesBatteryLevel(ctx context.Context) error {
-	return nil
+func (ddb MokedDroneRepo) LogDronesBatteryLevel() ([]entity.BatteryLevels, error) {
+	return []entity.BatteryLevels{}, nil
 }

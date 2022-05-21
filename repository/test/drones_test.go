@@ -381,7 +381,7 @@ func TestLogDronesBatteryLevel(t *testing.T) {
 	}
 
 	t.Run("Test retrieve all Drone data", func(t *testing.T) {
-		err := droneRepository.LogDronesBatteryLevel(context.Background())
+		logsRecord, err := droneRepository.LogDronesBatteryLevel()
 		if err != nil {
 			t.Errorf("[Error] Cannot log data: %v", err)
 		}
@@ -392,9 +392,10 @@ func TestLogDronesBatteryLevel(t *testing.T) {
 			t.Errorf("[Error] Cannot retrive battery logs data: %v", err)
 		}
 
+		assert.Equal(t, len(logsRecord), 2)
 		assert.Equal(t, len(batteryLevelLogs), 2)
 		for index, batteryLevel := range batteryLevelLogs {
-			assert.NotEmpty(t, batteryLevel.ID)
+			assert.Equal(t, logsRecord[index].ID, batteryLevel.ID)
 			assert.Equal(t, batteryLevel.DroneID, drones[index].ID)
 			assert.Equal(t, batteryLevel.BatteryLevel, float64(drones[index].BatteryCapacity))
 		}

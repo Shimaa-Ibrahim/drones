@@ -8,6 +8,9 @@ import (
 	"github/Shimaa-Ibrahim/grones/server"
 	"github/Shimaa-Ibrahim/grones/usecase"
 	"log"
+	"time"
+
+	"github.com/go-co-op/gocron"
 )
 
 const DEV_DRONE_DATABASE = "DEV_DRONE_DATABASE"
@@ -20,6 +23,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("[Error] failed to connect to database: %v", err)
 	}
+	// scheduler
+	scheduler := gocron.NewScheduler(time.UTC)
 
 	//repos
 	droneRepository := repository.NewDroneRepository(dbClient)
@@ -28,6 +33,7 @@ func main() {
 	//usecases
 	droneUseCase := usecase.NewDroneUseCase(droneRepository)
 	medicationUseCase := usecase.NewMedicationUseCase(medicationRepository, droneRepository)
+	periodicTasksUseCase := usecase.NewPeriodicTasksUseCase(droneRepository)
 
 	//apis
 	droneAPIs := apis.NewDroneAPI(droneUseCase)
@@ -38,5 +44,9 @@ func main() {
 		MedicationAPIs: medicationAPIs,
 	}
 
+	logDronesBatteryLevelTask := periodicTasksUseCase.LogDronesBatteryLevel
+	scheduler.Every(1).Hour().Do(logDronesBatteryLevelTask)
+	// periodic task to remove log files TODO
+	scheduler.StartAsync()
 	server.StartServer(apis)
 }

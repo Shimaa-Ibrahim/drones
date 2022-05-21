@@ -13,7 +13,7 @@ type DroneRepoProto interface {
 	GetByID(ctx context.Context, id uint) (entity.Drone, error)
 	GetDronesAvailableForLoading(ctx context.Context) ([]entity.Drone, error)
 	Get(ctx context.Context) ([]entity.Drone, error)
-	LogDronesBatteryLevel(ctx context.Context) error
+	LogDronesBatteryLevel() ([]entity.BatteryLevels, error)
 }
 
 type DroneRepo struct {
@@ -53,19 +53,22 @@ func (ddb DroneRepo) Get(ctx context.Context) ([]entity.Drone, error) {
 	return drones, result.Error
 }
 
-func (ddb DroneRepo) LogDronesBatteryLevel(ctx context.Context) error {
+func (ddb DroneRepo) LogDronesBatteryLevel() ([]entity.BatteryLevels, error) {
 	drones := []entity.Drone{}
-	if err := ddb.client.WithContext(ctx).Find(&drones).Error; err != nil {
-		return err
+	logsRecord := []entity.BatteryLevels{}
+	if err := ddb.client.Find(&drones).Error; err != nil {
+		return logsRecord, err
 	}
 
 	err := ddb.client.Transaction(func(tx *gorm.DB) error {
 		for _, drone := range drones {
-			if err := ddb.client.Model(&drone).Association("BatteryLevels").Append(&entity.BatteryLevels{BatteryLevel: float64(drone.BatteryCapacity)}); err != nil {
+			batteryLevelRecord := entity.BatteryLevels{BatteryLevel: float64(drone.BatteryCapacity)}
+			if err := ddb.client.Model(&drone).Association("BatteryLevels").Append(&batteryLevelRecord); err != nil {
 				return err
 			}
+			logsRecord = append(logsRecord, batteryLevelRecord)
 		}
 		return nil
 	})
-	return err
+	return logsRecord, err
 }
