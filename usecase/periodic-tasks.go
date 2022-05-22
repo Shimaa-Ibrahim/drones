@@ -26,7 +26,7 @@ func (p PeriodicTasksUseCase) LogDronesBatteryLevel() error {
 	for index, logRecord := range logsRecord {
 		log.Printf("[Record %v ]: %v\n", index, logRecord)
 	}
-	log.Println("battery logs ..................................")
+	log.Println("................................................")
 
 	return err
 }
