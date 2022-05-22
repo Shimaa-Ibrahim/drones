@@ -4,23 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github/Shimaa-Ibrahim/drones/repository"
 	repoEntity "github/Shimaa-Ibrahim/drones/repository/entity"
-	"github/Shimaa-Ibrahim/drones/repository/mocks"
-	"github/Shimaa-Ibrahim/drones/usecase"
 	"github/Shimaa-Ibrahim/drones/usecase/entity"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-var mockedDroneRepository repository.DroneRepoProto
-var droneUseCase usecase.DroneUseCaseProto
-
-func init() {
-	mockedDroneRepository = mocks.NewMockedDroneRepository()
-	droneUseCase = usecase.NewDroneUseCase(mockedDroneRepository)
-}
 
 func TestDroneSuccessfulRegisteration(t *testing.T) {
 	droneBytes := []byte(`{

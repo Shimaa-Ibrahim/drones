@@ -2,18 +2,14 @@ package test
 
 import (
 	"context"
-	"github/Shimaa-Ibrahim/drones/repository/mocks"
-	"github/Shimaa-Ibrahim/drones/usecase"
+	"encoding/json"
+	"github/Shimaa-Ibrahim/drones/repository/entity"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFailureToLoadDroneWithMedicationItems(t *testing.T) {
-	droneRepository := mocks.NewMockedDroneRepository()
-	medicationRepository := mocks.NewMockedMedicationRepository()
-	medicationUseCase := usecase.NewMedicationUseCase(medicationRepository, droneRepository)
-
 	type args struct {
 		ctx context.Context
 		req []byte
@@ -80,4 +76,26 @@ func TestFailureToLoadDroneWithMedicationItems(t *testing.T) {
 		})
 	}
 
+}
+
+func TestMedicationSuccessfulRegisteration(t *testing.T) {
+	medicationBytes := []byte(`{
+		"name": "med",
+		"code": "brt6l545eltgsl",
+		"weight": 500
+	}`)
+	t.Run("Test successful medication registeration", func(t *testing.T) {
+		createdMedicationBytes, err := medicationUseCase.RegisterMedication(context.Background(), medicationBytes, "imagePath")
+		if err != nil {
+			t.Errorf("[Error] Cannot create drone: %v", err)
+		}
+		medication := entity.Medication{}
+		if err := json.Unmarshal(createdMedicationBytes, &medication); err != nil {
+			t.Fatalf("[Error] Cannot  Unmarshal: %v", err)
+		}
+		assert.Equal(t, medication.Name, "med")
+		assert.Equal(t, medication.Code, "brt6l545eltgsl")
+		assert.Equal(t, medication.Weight, float64(500))
+		assert.Equal(t, medication.ImagePath, "imagePath")
+	})
 }

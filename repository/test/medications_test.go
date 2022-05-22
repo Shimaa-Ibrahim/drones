@@ -157,7 +157,7 @@ func TestMedicationSuccessfulCreation(t *testing.T) {
 
 	for index, medication := range medications {
 		t.Run(fmt.Sprintf("Test right data retrival for medication %v", index), func(t *testing.T) {
-			createdMedication, err := medicationRepository.CreateMedication(context.Background(), medication)
+			createdMedication, err := medicationRepository.Create(context.Background(), medication)
 			if err != nil {
 				t.Errorf("[Error] Cannot Create medication: %v", err)
 			}

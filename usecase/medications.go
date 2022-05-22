@@ -6,12 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"github/Shimaa-Ibrahim/drones/repository"
+	repoEntity "github/Shimaa-Ibrahim/drones/repository/entity"
 	"github/Shimaa-Ibrahim/drones/usecase/entity"
 
 	"gorm.io/gorm"
 )
 
 type MedicationUseCaseProto interface {
+	RegisterMedication(ctx context.Context, request []byte, imagePath string) ([]byte, error)
 	LoadDroneWithMedicationItems(ctx context.Context, request []byte) error
 }
 
@@ -78,4 +80,22 @@ func (m MedicationUseCase) LoadDroneWithMedicationItems(ctx context.Context, req
 
 	err = m.medicationRepo.UpdateMedicationsWithDroneID(ctx, droneMedicationsData.ID, droneMedicationsData.MedicatonsIDs)
 	return err
+}
+
+func (m MedicationUseCase) RegisterMedication(ctx context.Context, request []byte, imagePath string) ([]byte, error) {
+	medication := repoEntity.Medication{}
+	if err := json.Unmarshal(request, &medication); err != nil {
+		return []byte{}, err
+	}
+
+	if imagePath != "" {
+		medication.ImagePath = imagePath
+	}
+
+	drone, err := m.medicationRepo.Create(ctx, medication)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return json.Marshal(drone)
 }
