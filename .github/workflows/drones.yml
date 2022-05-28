@@ -1,4 +1,5 @@
 name: Drones build
+# on: [push, pull_request]
 on:
   push:
     branches: [main]
@@ -8,13 +9,38 @@ on:
 jobs:
   Build:
     runs-on: ubuntu-latest
+    env:
+      DRIVER: postgres
+      TEST_DRONE_DATABASE: postgres://postgres:postgres@localhost:5432/postgres
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: postgres        
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
+
+      - name: Setup test database
+        run: psql -U postgres -d postgres -p 5432 -a -q -c 'CREATE SCHEMA [IF NOT EXISTS] drones;'
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
+
+      - name: Run Migrations
+        run: gorm-goose -env test -path=repository/db -pgschema=drones up
 
       - name: Build
         run: go build -v .
