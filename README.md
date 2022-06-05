@@ -22,20 +22,21 @@ Behaviors
 - Prevent the drone from being in LOADING state if the battery level is **below 25%**;
 
  ##### APIs:
-    | Method | Api | functionality |
-    |------| ------ | ------ |
-    | POST | /drone/register/ | register drone|
-    | GET |  /drone/checkdroneloaded/{id}/  | Check Drone's Loaded Item |
-    | GET | /drone/availabledrones/ | Get Available Drones For Loading |
-    | GET | /drone/checkbattery/{id}/  | Check drone's battery level |
-    | POST | /medication/register/ | register Medication |
-    | POST | /medications/load/  | Load Drone With Medication Items |
+ 
+    | Method | Api                             | functionality                    |
+    |------  | ------                          | ------                           |
+    | POST   | /drone/register/                | register drone                   |
+    | GET    |  /drone/checkdroneloaded/{id}/  | Check Drone's Loaded Item        |
+    | GET    | /drone/availabledrones/         | Get Available Drones For Loading |
+    | GET    | /drone/checkbattery/{id}/       | Check drone's battery level      |
+    | POST   | /medication/register/           | register Medication              |
+    | POST   | /medications/load/              | Load Drone With Medication Items |
  
  ### Getting started:
 ##### Installation:
 ###### Make sure Golang is installed
 * Install all project dependencies with `go get ./...`
-* Run migrations gorm-goose -path=repository/db -pgschema=drones up
+* Run migrations `gorm-goose -path=repository/db -pgschema=drones up`
 * Load db seeds run `./repository/db/load-data.sh`
 
  sample of medication register
