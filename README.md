@@ -22,8 +22,7 @@ Behaviors
 - Prevent the drone from being in LOADING state if the battery level is **below 25%**;
 
  ##### APIs:
-    --
-    | | Api | functionality |
+    | Method | Api | functionality |
     |------| ------ | ------ |
     | POST | /drone/register/ | register drone|
     | GET |  /drone/checkdroneloaded/{id}/  | Check Drone's Loaded Item |
