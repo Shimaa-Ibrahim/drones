@@ -1,4 +1,4 @@
-# drones
+# Drones
 Golang
 
 ### Description
@@ -8,72 +8,32 @@ REST API service allows clients to communicate with the drones capable of loadin
 - [Postgresql](https://www.postgresql.org/) - DataBase
 - [GORM](https://gorm.io/) - ORM
 
-Features:
-- registering a drone;
-- loading a drone with medication items;
-- checking loaded medication items for a given drone; 
-- checking available drones for loading;
-- check drone battery level for a given drone;
-- registering a medication;
+#### Features:
+- registering a drone
+- loading a drone with medication items
+- checking battery level and loaded medication items for a given drone
+- checking available drones for loading
+- registering a medication
 - periodic task to check drones battery levels and create history/audit event log
 
-Behaviors
-- Prevent the drone from being loaded with more weight that it can carry;
-- Prevent the drone from being in LOADING state if the battery level is **below 25%**;
+#### Behaviors
+- load drone with medication item one item per each api call changing the drone state from idle to loading state (default) or loaded state if loaded = true
+- if loaded items reach the weight limit of the drone the state changed to loaded
+- available drones should be in IDLE or LOADING state
+- the drone cannot being loaded with more weight that it can carry;
+- the drone cannot being in LOADING state if the battery level is **below 25%**
 
- ##### APIs:
- 
-    | Method | Api                             | functionality                    |
-    |------  | ------                          | ------                           |
-    | POST   | /drone/register/                | register drone                   |
-    | GET    |  /drone/checkdroneloaded/{id}/  | Check Drone's Loaded Item        |
-    | GET    | /drone/availabledrones/         | Get Available Drones For Loading |
-    | GET    | /drone/checkbattery/{id}/       | Check drone's battery level      |
-    | POST   | /medication/register/           | register Medication              |
-    | POST   | /medications/load/              | Load Drone With Medication Items |
- 
+ ##### APIs Documentation:
+###### swagger: https://app.swaggerhub.com/apis/shimaa/drones/1.0.0
+
+
  ### Getting started:
 ##### Installation:
-###### Make sure Golang is installed
+###### Make sure Golang and Postgresql are installed
 * Install all project dependencies with `go get ./...`
 * Run migrations `gorm-goose -path=repository/db -pgschema=drones up`
-* Load db seeds run `./repository/db/load-data.sh`
-
- sample of medication register
-```
-curl --request POST \
-  --url http://localhost:3000/drone/register/ \
-  --header 'Content-Type: application/json' \
-  --data '{
-	"serial_number": "serial-1320-number",
-		"drone_model_id": 1,
-		"weight_limit": 500,
-		"battery_capacity": 75,
-		"drone_state_id": 1
-}'
-```   
-
- sample of load drone with medication items
-```
-curl --request POST \
-  --url http://localhost:3000/medications/load/ \
-  --header 'Content-Type: application/json' \
-  --data '{
-	"id": 1, 
-	"medications_ids": [1,2,3]
-}'
-```   
-    
-sample of medication register
-```
-curl --request POST \
-  --url http://localhost:3000/medication/register/ \
-  --header 'Content-Type: multipart/form-data' \
-  --header 'content-type: multipart/form-data; boundary=---011000010111000001101001' \
-  --form image=@/home/shimaa/Downloads/DcKMUlbVAAAyP1a.jpg \
-  --form 'medication={
-	"name": "medecationOne",
-	"code": "code",
-	"weight": 300
-}'
-```
+* required environmental variable:
+  - DB_DRIVER: db driver
+  - MAIN_DB: main db connection
+  - DEV_DRONE_DATABASE: drone db connection for development
+  - TEST_DRONE_DATABASE : drone db connection for testing

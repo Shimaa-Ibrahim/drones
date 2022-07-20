@@ -1,0 +1,259 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Drone APIs
+  description: 'golang project - fleet of drones capable of carrying medication items'
+servers:
+  - description: localhost
+    url: http://localhost:3000
+components:
+  schemas:
+    Drone:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        serial_number:
+          type: string
+        model:
+          type: string
+          enum:
+          - Lightweight
+          - Middleweight
+          - Cruiserweight
+          -  Heavyweight
+        state:
+          type: string
+          enum:
+          - IDLE
+          - LOADING
+          - LOADED
+          - DELIVERING
+          - DELIVERED
+          - RETURNING
+        battery_capacity:
+          type: number
+          minimum: 0
+          maximum: 100
+        weight_limit:
+          type: number
+          minimum: 0
+          maximum: 500
+        medications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medication'
+          readOnly: true
+      required:
+        - serial_number
+        - model
+        - state
+        - battery_capacity
+        - weight_limit
+    Medication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+          pattern: ^[a-zA-Z0-9\-\_]+$
+        code:
+          type: string
+          pattern: ^[a-zA-Z0-9\_]+$
+        weight:
+          type: number
+        image_path:
+          type: string
+          readOnly: true
+      required:
+        - name
+        - code
+        - weight
+paths:
+  /drone/:
+    post:
+      summary: register a new drone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Drone'
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drone'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: serial number is required
+  /drone/{droneId}:
+    get:
+      parameters:
+        - name: droneId
+          in: path
+          required: true
+          description: the ID of drone to return
+          schema:
+            type: integer
+
+      summary: retrun drone by ID
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drone'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: record not found
+  /drone/available:
+    get:
+      summary: return all available drones for loading medication items
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Drone'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: error occured
+  /drone/load:
+    post:
+      summary: load a given drone with a given medication item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                drone_id:
+                  type: integer
+                medication_id:
+                  type: integer
+                loaded:
+                  type: boolean
+              required:
+                - drone_id
+                - medication_id
+      responses:
+        '200':
+          description: the drone with loaded medication items to return
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Drone'
+  /medication/:
+    post:
+      summary: register a new medication
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                medications:
+                  $ref: '#/components/schemas/Medication'
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medication'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: record not found
+  /medication/{medicationId}:
+    get:
+      parameters:
+        - name: medicationId
+          in: path
+          required: true
+          description: the ID of medication to return
+          schema:
+            type: integer
+      summary: retrun medication by ID
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medication'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: record not found
+  /medication/all:
+    get:
+      summary: retrun all medications
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Medication'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: error occured
