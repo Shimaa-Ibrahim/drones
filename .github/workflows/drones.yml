@@ -10,14 +10,16 @@ jobs:
   Build:
     runs-on: ubuntu-latest
     env:
-      DRIVER: postgres
-      TEST_DRONE_DATABASE: postgresql://postgres:postgres@localhost:5432/drones
+      DB_DRIVER: postgres
+      MAIN_DB: postgresql://postgres:postgres@localhost:5432/postgres
+      DEV_DRONE_DATABASE: postgresql://postgres:postgres@localhost:5432/drones
+      TEST_DRONE_DATABASE: postgresql://postgres:postgres@localhost:5432/test_drones
 
     services:
       postgres:
-        image: postgres        
+        image: postgres
         env:
-          POSTGRES_DB: drones        
+          POSTGRES_DB: drones
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
 
@@ -34,22 +36,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup test database
-        run: docker exec drones_db bash -c 'PGPASSWORD=postgres psql -U postgres -d drones -h postgres -p 5432 -a -q -c "CREATE SCHEMA IF NOT EXISTS drones;"'
-
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
 
       - name: Install Dependencies
-        run: | 
+        run: |
           go get ./...
           go install github.com/CloudInn/gorm-goose/cmd/gorm-goose
-         
 
-      - name: Run Migrations
-        run: gorm-goose -env test -path=repository/db -pgschema=drones up
+
+      # - name: Run Migrations
+      #   run: docker exec drones_db bash -c 'gorm-goose -env test -path=repository/db -pgschema=drones up'
 
       - name: Build
         run: go build -v .
