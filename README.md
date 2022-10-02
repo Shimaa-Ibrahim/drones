@@ -32,6 +32,7 @@ REST API service allows clients to communicate with the drones capable of loadin
 ###### Make sure Golang and Postgresql are installed
 * Install all project dependencies with `go get ./...`
 * Run migrations `gorm-goose -path=repository/db -pgschema=drones up`
+* create .env file 
 * required environmental variable:
   - DB_ENGINE: db driver
   - MAIN_DB: main db connection
