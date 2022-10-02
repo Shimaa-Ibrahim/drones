@@ -19,7 +19,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: drones
+          DB_ENGINE: drones
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
 
@@ -45,10 +45,6 @@ jobs:
         run: |
           go get ./...
           go install github.com/CloudInn/gorm-goose/cmd/gorm-goose
-
-
-      # - name: Run Migrations
-      #   run: docker exec drones_db bash -c 'gorm-goose -env test -path=repository/db -pgschema=drones up'
 
       - name: Build
         run: go build -v .

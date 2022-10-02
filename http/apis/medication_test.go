@@ -8,14 +8,15 @@ import (
 	mockedFile "github/Shimaa-Ibrahim/drones/iofile/mock"
 	"github/Shimaa-Ibrahim/drones/repository"
 	"github/Shimaa-Ibrahim/drones/repository/mock"
+	"io"
+	"path"
+	"runtime"
 
 	"github/Shimaa-Ibrahim/drones/usecase"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"path"
-	"runtime"
 	"testing"
 	"time"
 
@@ -49,7 +50,7 @@ func TestMedicationRegister(t *testing.T) {
 		{
 			name:       "[Test] successful register medication with image",
 			ctx:        context.Background(),
-			image:      "test-files/go.png",
+			image:      "http/apis/test-files/go.png",
 			reqBody:    `{"name":"go","code":"go_code","weight":1}`,
 			want:       fmt.Sprintf(`{"id":0,"name":"go","weight":1,"code":"go_code","image_path":"%v-go.png"}`, time.Now().Format(time.RFC3339)),
 			statusCode: http.StatusCreated,
@@ -67,7 +68,7 @@ func TestMedicationRegister(t *testing.T) {
 		{
 			name:       "[Test] register medication should return error if file is not image",
 			ctx:        context.Background(),
-			image:      "test-image/txt.txt",
+			image:      "http/apis/test-files/txt.txt",
 			reqBody:    `{"name":"go","code":"noImage","weight":1}`,
 			want:       `{"error":"invalid file type"}`,
 			statusCode: http.StatusBadRequest,
@@ -94,7 +95,17 @@ func TestMedicationRegister(t *testing.T) {
 			if err != nil {
 				t.Errorf("[Error] createFromFile: %v\n", err)
 			}
-			part.Write([]byte(`sample`))
+			if tt.image != "" {
+				file, err := os.Open(tt.image)
+				if err != nil {
+					t.Errorf("[Error] Open file: %v\n", err)
+				}
+				defer file.Close()
+				_, err = io.Copy(part, file)
+				if err != nil {
+					t.Errorf("[Error] Copy File: %v\n", err)
+				}
+			}
 			writer.Close()
 			req, err := http.NewRequest("POST", "", body)
 			req.Header.Set("Content-Type", writer.FormDataContentType())

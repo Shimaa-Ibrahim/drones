@@ -48,8 +48,8 @@ func main() {
 		MedicationAPIs: medicationAPIs,
 	}
 
-	logDronesBatteryLevelTask := batteryLogsUsecase.Create(context.Background())
-	scheduler.Every(1).Hour().Do(logDronesBatteryLevelTask)
+	logDronesBatteryLevelTask := batteryLogsUsecase.Create
+	scheduler.Every(1).Hour().Do(logDronesBatteryLevelTask, context.Background())
 	// periodic task to remove log files TODO
 
 	scheduler.StartAsync()

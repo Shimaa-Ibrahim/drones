@@ -25,6 +25,7 @@ func NewBatterylogUsecase(droneRepository repository.DroneRepo, batteryLogsRepos
 }
 
 func (b BatteryLogs) Create(ctx context.Context) error {
+	fmt.Println("[Logs] Battery Levels...")
 	drones, err := b.droneRepository.GetAll(ctx)
 	if err != nil {
 		log.Printf("[Error]: %v\n", err)

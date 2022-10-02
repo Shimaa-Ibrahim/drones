@@ -33,7 +33,7 @@ REST API service allows clients to communicate with the drones capable of loadin
 * Install all project dependencies with `go get ./...`
 * Run migrations `gorm-goose -path=repository/db -pgschema=drones up`
 * required environmental variable:
-  - DB_DRIVER: db driver
+  - DB_ENGINE: db driver
   - MAIN_DB: main db connection
   - DEV_DRONE_DATABASE: drone db connection for development
   - TEST_DRONE_DATABASE : drone db connection for testing

@@ -25,7 +25,7 @@ func StartServer(apis APIs) {
 
 	medicationSubrouter := r.PathPrefix("/medication").Subrouter()
 	medicationSubrouter.HandleFunc("/", apis.MedicationAPIs.Register).Methods("POST")
-	medicationSubrouter.HandleFunc("/all", apis.MedicationAPIs.GetAll).Methods("GET")
+	medicationSubrouter.HandleFunc("/", apis.MedicationAPIs.GetAll).Methods("GET")
 	medicationSubrouter.HandleFunc("/{id}", apis.MedicationAPIs.Get).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":3000", r))

@@ -1,11 +1,11 @@
 test:
-    driver: $DB_DRIVER
+    driver: $DB_ENGINE
     open: $TEST_DRONE_DATABASE
 
 development:
-    driver: $DB_DRIVER
+    driver: $DB_ENGINE
     open: $DEV_DRONE_DATABASE
 
 environment_variable_config:
-    driver: $DB_DRIVER
+    driver: $DB_ENGINE
     open: $DEV_DRONE_DATABASE
